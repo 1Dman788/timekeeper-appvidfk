@@ -1,200 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timekeeper</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timekeeper</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <h1>Timekeeper</h1>
+  <div id="app">
+    <h1>Timekeeper</h1>
 
-        <!-- Login Section -->
-        <div id="login-section">
-            <h2>Login</h2>
-            <div class="form-row">
-                <label for="login-username">Username</label>
-                <input type="text" id="login-username" autocomplete="username">
-            </div>
-            <div class="form-row">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" autocomplete="current-password">
-            </div>
-            <div class="form-row">
-                <label for="login-role">Role</label>
-                <select id="login-role">
-                    <option value="employee">Employee</option>
-                    <option value="admin">Administrator</option>
-                </select>
-            </div>
-            <button id="login-button">Login</button>
-            <p id="login-error" class="error"></p>
-        </div>
-
-        <!-- Employee Section -->
-        <div id="employee-section" class="hidden">
-            <h2>Employee Dashboard</h2>
-            <p id="employee-welcome" class="subtitle"></p>
-            <div id="shift-info" class="info"></div>
-            <div class="button-row">
-                <button id="punch-in-button" class="primary">Punch In</button>
-                <button id="punch-out-button" class="hidden primary">Punch Out</button>
-            </div>
-            <p id="punch-message"></p>
-            <div class="button-row">
-                <button id="view-history-button" class="secondary">View History</button>
-                <button id="employee-logout-button" class="secondary">Logout</button>
-            </div>
-            <div id="history-section" class="hidden">
-                <h3>Your History</h3>
-                <!--
-                    The history table for employees displays their past
-                    punches and computed hours. Administrators can apply
-                    deductions to individual logs; those values will be
-                    reflected here as read‑only data. Employees cannot
-                    edit these fields from this view. Therefore the
-                    table does not include input fields or save
-                    buttons.
-                -->
-                <table id="history-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Punch In</th>
-                            <th>Punch Out</th>
-                            <th>Hours Worked</th>
-                            <th>Pay Period Start</th>
-                            <th>Deduction (min)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Administrator Section -->
-        <div id="admin-section" class="hidden">
-            <h2>Administrator Dashboard</h2>
-            <div class="button-row">
-                <button id="admin-logout-button" class="secondary">Logout</button>
-            </div>
-            <h3>Employee Management</h3>
-            <div id="add-employee-form" class="card">
-            <h4>Add Employee</h4>
-                <div class="form-row">
-                    <label for="new-emp-username">Username</label>
-                    <input type="text" id="new-emp-username" />
-                </div>
-                <div class="form-row">
-                    <label for="new-emp-password">Password</label>
-                    <input type="password" id="new-emp-password" />
-                </div>
-                <div class="form-row">
-                    <label for="new-emp-rate">Hourly Rate ($/hr)</label>
-                    <input type="number" id="new-emp-rate" min="0" step="0.01" />
-                </div>
-                <!--
-                    Employees no longer have fixed shift start and end times. Their
-                    actual shift is determined by when they punch in and punch out.
-                -->
-                <button id="add-employee-button" class="primary">Add Employee</button>
-                <p id="add-employee-error" class="error"></p>
-            </div>
-            <div class="card">
-                <h4>Existing Employees</h4>
-                <table id="employees-table">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Hourly Rate ($)</th>
-                            <!-- Shift start/end removed because shifts are set when punching -->
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div class="card">
-                <h4>Pay Period Settings</h4>
-                <p>Enter pay period start days (comma-separated, e.g., "1,15"):</p>
-                <input type="text" id="pay-period-days" placeholder="1,15">
-                <button id="save-pay-period" class="primary">Save Settings</button>
-                <p id="pay-period-message"></p>
-            </div>
-            <div class="card">
-                <h4>Summaries</h4>
-                <button id="generate-summary-button" class="primary">Generate Summary</button>
-                <table id="summary-table" class="hidden">
-                    <thead>
-                        <tr>
-                            <th>Pay Period Start</th>
-                            <th>Employee</th>
-                            <th>Total Hours</th>
-                            <th>Total Pay ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <button id="export-summary-button" class="hidden secondary">Export CSV</button>
-            </div>
-            <div class="card">
-                <h4>Logs</h4>
-                <!--
-                    The logs table in the admin view displays every
-                    punch event. Administrators can adjust the number
-                    of minutes to deduct from a shift by entering a
-                    value in the "Deduct" column and clicking Save.
-                    The new hours and pay computations are applied
-                    instantly and reflected across the app.
-                -->
-                <table id="logs-table">
-                    <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Date</th>
-                            <th>Punch In</th>
-                            <th>Punch Out</th>
-                            <th>Hours Worked</th>
-                            <th>Pay Period Start</th>
-                            <th>Deduct (min)</th>
-                            <th>Save</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
+    <!-- Login Section -->
+    <div id="login-section">
+      <h2>Login</h2>
+      <div class="form-row">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="username">
+      </div>
+      <div class="form-row">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password">
+      </div>
+      <div class="form-row">
+        <label for="login-role">Role</label>
+        <select id="login-role">
+          <option value="employee">Employee</option>
+          <option value="admin">Administrator</option>
+        </select>
+      </div>
+      <button id="login-button">Login</button>
+      <p id="login-error" class="error"></p>
     </div>
 
-    <!-- Firebase libraries. Including these scripts enables
-         communication with Firestore from a static site. If you leave
-         `firebaseConfig` undefined, the application will automatically
-         fall back to localStorage so you can continue to test locally.
-         To enable cloud persistence and cross‑device synchronization,
-         replace the placeholder values below with your own Firebase
-         project's configuration (available from the Firebase console).  -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script>
-        // TODO: Update with your Firebase project's configuration.
-        // You can find this information in your Firebase console. When
-        // these values are provided, the app will use Firestore for
-        // persistent, cross‑device storage. When left empty or
-        // undefined, the app stores everything in browser storage (for
-        // testing and offline usage).
-        const firebaseConfig = {
-            // apiKey: "",
-            // authDomain: "",
-            // projectId: "",
-            // storageBucket: "",
-            // messagingSenderId: "",
-            // appId: ""
-        };
-        // Expose the config globally so the script can detect it
-        window.firebaseConfig = firebaseConfig;
-    </script>
-    <script src="script.js"></script>
+    <!-- Employee Section -->
+    <div id="employee-section" class="hidden">
+      <h2>Employee Dashboard</h2>
+      <p id="employee-welcome" class="subtitle"></p>
+      <div id="shift-info" class="info"></div>
+      <div class="button-row">
+        <button id="punch-in-button" class="primary">Punch In</button>
+        <button id="punch-out-button" class="hidden primary">Punch Out</button>
+      </div>
+      <p id="punch-message"></p>
+      <div class="button-row">
+        <button id="view-history-button" class="secondary">View History</button>
+        <button id="employee-logout-button" class="secondary">Logout</button>
+      </div>
+      <div id="history-section" class="hidden">
+        <h3>Your History</h3>
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Punch In</th>
+              <th>Punch Out</th>
+              <th>Hours Worked</th>
+              <th>Pay Period Start</th>
+              <th>Deduction (min)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Administrator Section -->
+    <div id="admin-section" class="hidden">
+      <h2>Administrator Dashboard</h2>
+      <div class="button-row">
+        <button id="admin-logout-button" class="secondary">Logout</button>
+      </div>
+      <h3>Employee Management</h3>
+      <div id="add-employee-form" class="card">
+        <h4>Add Employee</h4>
+        <div class="form-row">
+          <label for="new-emp-username">Username</label>
+          <input type="text" id="new-emp-username" />
+        </div>
+        <div class="form-row">
+          <label for="new-emp-password">Password</label>
+          <input type="password" id="new-emp-password" />
+        </div>
+        <div class="form-row">
+          <label for="new-emp-rate">Hourly Rate ($/hr)</label>
+          <input type="number" id="new-emp-rate" min="0" step="0.01" />
+        </div>
+        <button id="add-employee-button" class="primary">Add Employee</button>
+        <p id="add-employee-error" class="error"></p>
+      </div>
+      <div class="card">
+        <h4>Existing Employees</h4>
+        <table id="employees-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Hourly Rate ($)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h4>Pay Period Settings</h4>
+        <p>Enter pay period start days (comma-separated, e.g., "1,15"):</p>
+        <input type="text" id="pay-period-days" placeholder="1,15">
+        <button id="save-pay-period" class="primary">Save Settings</button>
+        <p id="pay-period-message"></p>
+      </div>
+      <div class="card">
+        <h4>Summaries</h4>
+        <button id="generate-summary-button" class="primary">Generate Summary</button>
+        <table id="summary-table" class="hidden">
+          <thead>
+            <tr>
+              <th>Pay Period Start</th>
+              <th>Employee</th>
+              <th>Total Hours</th>
+              <th>Total Pay ($)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button id="export-summary-button" class="hidden secondary">Export CSV</button>
+      </div>
+      <div class="card">
+        <h4>Logs</h4>
+        <table id="logs-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Date</th>
+              <th>Punch In</th>
+              <th>Punch Out</th>
+              <th>Hours Worked</th>
+              <th>Pay Period Start</th>
+              <th>Deduct (min)</th>
+              <th>Save</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (compat mode) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCxHIwiv6CuN8ZakDyroi0hOUczmqIFouQ",
+      authDomain: "timekeeptest.firebaseapp.com",
+      projectId: "timekeeptest",
+      storageBucket: "timekeeptest.appspot.com",
+      messagingSenderId: "988841712680",
+      appId: "1:988841712680:web:7c4d35fc4e449289f9691d",
+      measurementId: "G-PK9BG4QVR5"
+    };
+    window.firebaseConfig = firebaseConfig;
+  </script>
+  <script src="script.js"></script>
 </body>
 </html>
